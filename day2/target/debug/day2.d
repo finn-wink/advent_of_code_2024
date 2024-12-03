@@ -1,1 +1,1 @@
-/home/finno/projects/AoC_24/day2/target/debug/day2: /home/finno/projects/AoC_24/day2/src/main.rs
+/Users/winke/Documents/Programming/advent_for_code/day2/target/debug/day2: /Users/winke/Documents/Programming/advent_for_code/day2/src/main.rs

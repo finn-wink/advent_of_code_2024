@@ -1,8 +1,3 @@
-// Read a line of text
-// Make a new list of the differences between the numbers
-// Check for lists that have values below 1 or above 3
-// Check for lists that have both positive and negative values
-
 use std::fs::File;
 use std::io::{self, BufRead};
 
@@ -38,22 +33,35 @@ fn main() -> io::Result<()> { // returns nothing on success
     let mut sum = 0;
 
     for x in diff_list.iter() {
-        if x.iter().max() > 3 { // if max is bigger than 3
+        if let Some(&max_value) = x.iter().max() {
+            if max_value > 3 { // if max is bigger than 3
+                println!("1");
+                continue;
+        }
+        
+        if let Some(&min_value) = x.iter().min() {
+            if min_value < -3 { // if min is smaller than -3
+                println!("2");
+                continue;
+            } 
+            if min_value < 0 && max_value > 0 {
+                println!("3");
+                continue;
+            }
+        } else {
+            println!("The vector is empty");
+        }
+        } else {
+            println!("The vector is empty");
+        }
+        if x.iter().any(|&y| y == 0) {
             continue;
         }
-        if x.iter().min() < -3 { // if min is smaller than -3
-            continue;
-        }
-        if x.contains(&0) {
-            continue;
-        }
-
-        // if there is positive and negative numbers
-
         sum += 1;
+        println!("{:?}", x);
     }
 
-    println!("{:?}", diff_list);
+    println!("{}", sum);
 
     Ok(()) // for the no-return of main
 }
