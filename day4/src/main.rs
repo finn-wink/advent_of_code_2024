@@ -8,7 +8,25 @@ fn main() -> io::Result<()> { // returns nothing on success
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
 
-    for c in contents.chars()
+    let mut array1: Vec<i32> = Vec::new();
+
+    for c in contents.chars() {
+        if c == 'X' {
+            array1.push(1);
+        }
+        if c == 'M' {
+            array1.push(2);
+        }
+        if c == 'A' {
+            array1.push(3);
+        }
+        if c == 'S' {
+            array1.push(4);
+        }
+        else {
+            println!("Couldn't match letter");
+        }
+    }
 
     // Initialize an array with the first row
     // Append the rest of the rows to the matrix
