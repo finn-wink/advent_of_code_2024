@@ -1,8 +1,32 @@
 import numpy as np
 
 def is_coord_inside(coords, m_orig):
-    if coords[0] >= 0 and coords[0] < m_orig.shape[1] and coords[1] >=0 and coords[1] < m_orig.shape[1]:
+    if coords[0] >= 0 and coords[0] < m_orig.shape[0] and coords[1] >= 0 and coords[1] < m_orig.shape[1]:
         return True
+    else:
+        return False
+
+def find_distance(coords):
+    
+    dist_y = coords[0][0] - coords[1][0]
+    dist_x = coords[0][1] - coords[1][1]
+
+    return (dist_y, dist_x)
+
+def find_backward(coords, distance):
+    
+    hash1_y = coords[0] + distance[0]
+    hash1_x = coords[1] + distance[1]
+
+    return (hash1_y, hash1_x)
+
+def find_forward(coords, distance):
+
+    hash2_y = coords[0] + distance[0] * -1
+    hash2_x = coords[1] + distance[1] * -1
+
+    return (hash2_y, hash2_x)
+
 
 
 f = open('input.txt', 'r')
@@ -31,7 +55,8 @@ for line in r:
 
 m_orig = np.array(bigList)
 
-hash_list = []
+antinodes = []
+antennas = []
 
 for sym in all_symbols.values():
     
@@ -41,35 +66,53 @@ for sym in all_symbols.values():
     coords = np.where(m_orig == sym)
     coords = list(zip(*coords))
     coords_ind = np.arange(len(coords))
-    print(coords_ind)
+
     comb_array = np.array(np.meshgrid(coords_ind, coords_ind)).T.reshape(-1, 2) 
     
     for i in comb_array:
         
         coord1 = coords[i[0]]
         coord2 = coords[i[1]]
-
+        
         if coord1 != coord2:
-            print(coord1, coord2)
-            dist_y = coord1[0] - coord2[0]
-            dist_x = coord1[1] - coord2[1]
-            print([dist_y, dist_x])
             
-            hash1_y = coord1[0] + dist_y 
-            hash1_x = coord1[1] + dist_x 
+            check_forward = True
+            check_backward = True
+            
+            distance = find_distance([coord1, coord2])
 
-            hash2_y = coord2[0] + dist_y * -1
-            hash2_x = coord2[1] + dist_x * -1
+            search_coord1 = coord1
+            search_coord2 = coord2
 
-            if is_coord_inside([hash1_y, hash1_x], m_orig):
-                if [hash1_y, hash1_x] not in hash_list:
-                    hash_list.append([hash1_y, hash1_x])
+            while True:
 
-            if is_coord_inside([hash2_y, hash2_x], m_orig):
-                if [hash2_y, hash2_x] not in hash_list:
-                    hash_list.append([hash2_y, hash2_x])
+                backward = find_backward(search_coord1, distance)
+                forward = find_forward(search_coord2, distance)
+                
+                if check_forward:
+                    if is_coord_inside(forward, m_orig):
+                        if forward not in antinodes:
+                            antinodes.append(forward)
+                    else:
+                        check_forward = False
 
-print(len(hash_list))
+                if check_backward:
+                    if is_coord_inside(backward, m_orig):
+                        if backward not in antinodes:
+                            antinodes.append(backward)
+                    else:
+                        check_backward = False
+                
+                search_coord1 = backward
+                search_coord2 = forward
 
-# diff list
-# check if diffs on either side are in the square
+                if not check_forward and not check_backward:
+                    antennas.append(coord1)
+                    antennas.append(coord2)
+                    break
+
+for ant in antennas: # Add antennas to antinodes
+    if ant not in antinodes:
+        antinodes.append(ant)
+
+print(len(antinodes))
