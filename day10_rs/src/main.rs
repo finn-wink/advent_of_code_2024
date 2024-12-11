@@ -89,15 +89,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         println!{"{}", cur_search.len()}
 
+        // For first part of the question, remove duplicates, for second leave them
+
         // Find unique tuples
-        let mut seen = HashSet::new();
+        // let mut seen = HashSet::new();
     
-        let unique_tops: Vec<_> = cur_search.clone()
-            .into_iter()
-            .filter(|t| seen.insert(*t))
-            .collect();
-    
-        total_trails += unique_tops.len() as i32;
+        // let unique_tops: Vec<_> = cur_search.clone()
+        //     .into_iter()
+        //     .filter(|t| seen.insert(*t))
+        //     .collect();
+        
+        // total_trails += unique_tops.len() as i32;
+        total_trails += cur_search.len() as i32;
     }
 
     println!("{}", total_trails);
