@@ -8,8 +8,8 @@ registers = {}
 
 for i, line in enumerate(f):
     if 'Register' in line:
-        if i == 0:
-            registers['a'] = int(line[12:].strip())
+        # if i == 0:
+        #     registers['a'] = int(line[12:].strip())
         if i == 1:
             registers['b'] = int(line[12:].strip())
         if i == 2:
@@ -83,53 +83,63 @@ output = []
 count = 0
 breaker = False
 
-while not solved:
+search_start = 0
+search_end = 0
 
-    indeces = generate_indeces(start_list, length_list)
-    halt = max(indeces)
+for ra in range(100, 1000000000000000):
+    registers['a'] = ra
 
-    for x in indeces:
-        # print('x ' + str(x))
-        if program[x] == 0:
-            opcode_0(program[x+1], registers)
-        
-        if program[x] == 1:
-            opcode_1(program[x+1], registers)
-        
-        if program[x] == 2:
-            opcode_2(program[x+1], registers)
-        
-        if program[x] == 3:
-            index = opcode_3(program[x+1], registers)
+    while not solved:
 
-            if index == 100:
-                print("didn't get em")
+        indeces = generate_indeces(start_list, length_list)
+        halt = max(indeces)
+
+        for x in indeces:
+            # print('x ' + str(x))
+            if program[x] == 0:
+                opcode_0(program[x+1], registers)
             
-            else:
-                start_list = index
-                # print("Gottem")
+            if program[x] == 1:
+                opcode_1(program[x+1], registers)
+            
+            if program[x] == 2:
+                opcode_2(program[x+1], registers)
+            
+            if program[x] == 3:
+                index = opcode_3(program[x+1], registers)
+
+                if index == 100:
+                    print("didn't get em")
+                
+                else:
+                    start_list = index
+                    # print("Gottem")
+                    break
+            
+            if program[x] == 4:
+                register_b = opcode_4(registers)
+            
+            if program[x] == 5:
+                res = opcode_5(program[x+1], registers)
+                output.append(res)
+            
+            if program[x] == 6:
+                opcode_6(program[x+1], registers)
+
+            if program[x] == 7:
+                opcode_7(program[x+1], registers)
+
+            if x == halt:
+                breaker = True
                 break
-        
-        if program[x] == 4:
-            register_b = opcode_4(registers)
-        
-        if program[x] == 5:
-            res = opcode_5(program[x+1], registers)
-            output.append(res)
-        
-        if program[x] == 6:
-            opcode_6(program[x+1], registers)
+            
+            count += 1
 
-        if program[x] == 7:
-            opcode_7(program[x+1], registers)
-
-        if x == halt:
-            breaker = True
+        if breaker:
             break
-        
-        count += 1
-
-    if breaker:
+    print(ra)
+    if output == program:
+        print(ra)
         break
 
 print(output)
