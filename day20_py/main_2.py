@@ -49,27 +49,21 @@ def dijkstra(matrix, start, end):
 
     return path
 
-def find_pass_through(arr):
-
-    row_patterns = []
-    col_patterns = []
-
-    pattern_1 = [0, 1, 0]
-
-    pattern_1_len = len(pattern_1)
+def find_all_cheats(position, full_path, arr):
+    
     rows, cols = arr.shape
+    x, y = position
 
-    for i in range(rows):
-        for j in range(cols - pattern_1_len + 1):
-            if np.array_equal(arr[i,j:j+pattern_1_len], pattern_1):
-                row_patterns.append(((i),(j,j+pattern_1_len)))              
+    cheat_positions = []
 
-    for i in range(rows - pattern_1_len + 1):
-        for j in range(cols):
-            if np.array_equal(arr[i:i+pattern_1_len,j], pattern_1):
-                col_patterns.append(((i,i+pattern_1_len),(j)))
+    for xx in range(-20, 21):
+        for yy in range(-20, 21):
+            if abs(xx) + abs(yy) <= 20:
+                n_x, n_y = x + xx, y + yy
+                if 0 <= n_x < rows and 0 <= n_y < cols and arr[(n_y, n_x)] != 1 and (n_y,n_x) not in FULL_PATH:
+                    cheat_positions.append(n_x, n_y)
 
-    return row_patterns, col_patterns
+    return cheat_positions
 
 f = open('input.txt', 'r')
 
@@ -102,45 +96,14 @@ arr[start] = 0
 arr[end] = 0
 
 solution = dijkstra(arr, start, end)
-FULL_PATH = len(solution)
-
-row_patterns, col_patterns = find_pass_through(arr)
+FULL_PATH_LENGTH = len(solution)
+FULL_PATH = solution
 
 len_finds = {}
 
-for f in row_patterns:
-    
-    row_arr = arr.copy()
-    row_arr[f[0],f[1][0]:f[1][1]] = 0
-    solution = dijkstra(row_arr, start, end)
-    if FULL_PATH - len(solution) not in len_finds:
-        len_finds[FULL_PATH - len(solution)] = 1
-    else:
-        len_finds[FULL_PATH - len(solution)] += 1
-  
-for f1 in col_patterns:
-    
-    row_arr = arr.copy()
-    row_arr[f1[0][0]:f1[0][1],f1[1]] = 0
-    solution = dijkstra(row_arr, start, end)
-    if FULL_PATH - len(solution) not in len_finds:
-        len_finds[FULL_PATH - len(solution)] = 1
-    else:
-        len_finds[FULL_PATH - len(solution)] += 1
+test = find_all_cheats()
 
-print(len_finds)
+# For each position, find the positions that you can cheat to
+# Check how fast each cheat is from that position
+# Since there is only one path, ignore all the ones that are on the path
 
-count = 0
-
-for k in len_finds.keys():
-    if k > 99:
-        count += len_finds[k]
-
-print(count)
-
-# re-run the check keeping all starting positions
-
-
-# Check each possible position for the racer to be
-# At that position, to the next position there can only be
-# - Direct pattern of 

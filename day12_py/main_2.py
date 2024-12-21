@@ -1,4 +1,4 @@
-import numpy as np
+iimport numpy as np
 
 def search(pos, arr, visited, current):
     rows, cols = arr.shape
@@ -59,8 +59,8 @@ for island in unique:
         px, py = x + 1, y + 1
         p = 4
 
-        if pad_arr[px + 1, py] == pad_arr[px, py]:
-            p -= 1
+        if pad_arr[px + 1, py] != pad_arr[px, py]:
+            
         if pad_arr[px - 1, py] == pad_arr[px, py]:
             p -= 1
         if pad_arr[px, py + 1] == pad_arr[px, py]:
