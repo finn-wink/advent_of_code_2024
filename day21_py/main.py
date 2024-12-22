@@ -44,8 +44,13 @@ def path_to_moves(path):
     path_length = len(path)
     moves = []
 
+    if len(path) == 1:
+        moves.append(5)
+        return moves
+
     for i, m in enumerate(path):
         if i == path_length - 1:
+            moves.append(5) # ENTER -> A
             break
     
         direction_diff = tuple(np.subtract(path[i+1], m)) 
@@ -60,53 +65,112 @@ def path_to_moves(path):
 
     return moves
 
-def find_shortest_paths(numpad, current, to_find, forbidden):
+def moves_to_dir(moves):
+
+    dir_positions = []
+
+    for m in moves:
+        if m == 1:
+            dir_positions.append((0,1))
+        if m == 2:
+            dir_positions.append((1,0))
+        if m == 3:
+            dir_positions.append((1,1))
+        if m == 4:
+            dir_positions.append((1,2))
+        if m == 5:
+            dir_positions.append((0,2))
+
+    return dir_positions
+
+def get_shortest_paths(paths):
+
+    shortest_len = min(len(path) for path in paths) # Find the shortest length
+    shortest_paths = [p for p in paths if len(p) == shortest_len] # Get all paths with shortest length 
+
+    return shortest_paths
+
+def find_num_paths(numpad, current, to_find, forbidden):
 
     new_y, new_x = np.where(numpad == to_find)
 
     all_paths = find_all_paths(numpad, current, (new_y[0], new_x[0]), forbidden)
-    shortest_len = min(len(path) for path in all_paths) # Find the shortest length
-    shortest_paths = [p for p in all_paths if len(p) == shortest_len] # Get all paths with shortest length
+    shortest_paths = get_shortest_paths(all_paths)
+    
+    shortest_moves = []
+    for s in shortest_paths:
+        shortest_moves.append(path_to_moves(s))
 
-    moves = shor
-
-    return shortest_paths
+    return shortest_moves
 
 
-# Figure out all the possible moves to get from one to the other
-# Take only the shortest
-# Keep only the shortest ones
-# Use those to find all possible moves in the next one
-# Keep only the shortest ones
+def find_dir_paths(dirpad, curr_pos, moves, forbid_dir):
+    
+    dir_pos = moves_to_dir(moves)
+    # print(dir_pos)
+    possible_paths = []
 
+    for i, dp in enumerate(dir_pos):
+        if i < len(dir_pos) - 1 and dp == dir_pos[i-1]:
+            possible_paths.append([[dp]])
+            continue
+        elif i == 0:
+            all_paths = find_all_paths(dirpad, curr_pos, dp, forbid_dir)
+        else:
+            all_paths = find_all_paths(dirpad, dir_pos[i-1], dp, forbid_dir)
+        # print(dir_pos[i-1])
+        # print(dp)
+        pp = get_shortest_paths(all_paths)
+        possible_paths.append(pp)
+
+        possible_directions = []
+
+        for pp in possible_paths:
+            dir_group = []
+            for dd in pp:
+                dir_group.append(path_to_moves(dd))
+            possible_directions.append(dir_group)
+
+    return possible_directions
 
 # code_to_check = [0, 2, 9, 10] # Translate codes into numbers
-code_to_check = [9]
+code_to_check = [0, 2, 9, 10]
 
 num_pad = np.array([[7, 8, 9], [4, 5, 6], [1, 2, 3], [100, 0, 10]])
 dir_pad = np.array([[100, 1, 10], [2, 3, 4]])
 
-press_number = (0,2)
+# press_number = (0,2)
 
 dir_pad_me = (0,2)
 dir_pad_robot1 = (0,2)
 dir_pad_robot2 = (0,2)
-num_pad_pos = (3,1)
+num_pad_pos = (3,2)
 
-do_not_go = (3,0)
+forbid_num = (3,0)
+forbid_dir = (0,0)
+
+full1 = []
 
 for num in code_to_check:
-    directions = find_shortest_paths(num_pad, num_pad_pos, num, do_not_go)
-    # for d in directions:
-    #     directions1 = find_path(dir_pad, dir_pad_robot2, d)
+    directions = find_num_paths(num_pad, num_pad_pos, num, forbid_num)
+    directions1 = find_dir_paths(dir_pad, dir_pad_robot1, directions[0], forbid_dir)
+    for d1 in directions1:
+        directions2 = find_dir_paths(dir_pad, dir_pad_robot2, d1[0], forbid_dir)
+        for d2 in directions2:
+            directions3 = find_dir_paths(dir_pad, dir_pad_me, d2[0], forbid_dir)
+            for d3 in directions3:
+                full1.append(d3[0])
 
-        # for d1 in directions1:
-        #     directions2 = find_path(dir_pad, dir_pad_robot1, d1)
-        #     for d2 in directions2:
-        #         directions_me = find_path(dir_pad, dir_pad_me, d2)
-    break
+count = 0
+for tt in full1:
+    for zz in tt:
+        count+=1
 
-print(directions)
+print(count)
+# print(count)
+# print(full_moves)
+
+# print(directions)
 # print(directions1)
 # print(directions2)
 # print(directions_me)
