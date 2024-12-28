@@ -1,4 +1,4 @@
-iimport numpy as np
+import numpy as np
 
 def search(pos, arr, visited, current):
     rows, cols = arr.shape
@@ -34,8 +34,8 @@ with open('input.txt', 'r') as f:
         arr_arr.append(arr_line)
 
 arr = np.array(arr_arr)
-print(arr.shape[0])
-print(arr.shape[1])
+# print(arr.shape[0])
+# print(arr.shape[1])
 
 visited = set()
 unique = []
@@ -52,26 +52,60 @@ pad_arr = np.pad(arr, pad_width=1, mode='constant', constant_values=100)
 total_p = 0
 
 for island in unique:
-    perimeter = 0
-    area = len(island)
+    sides = 0
 
-    for x, y in island:
-        px, py = x + 1, y + 1
-        p = 4
+    for y, x in island:
+        py, px = y + 1, x + 1
+        current_square = pad_arr[py, px] 
 
-        if pad_arr[px + 1, py] != pad_arr[px, py]:
-            
-        if pad_arr[px - 1, py] == pad_arr[px, py]:
-            p -= 1
-        if pad_arr[px, py + 1] == pad_arr[px, py]:
-            p -= 1
-        if pad_arr[px, py - 1] == pad_arr[px, py]:
-            p -= 1
+        up = False
+        down = False
+        right = False
+        left = False
 
-        perimeter += p
+        if pad_arr[py + 1, px] == pad_arr[py, px]:
+            down = True
+        if pad_arr[py - 1, px] == pad_arr[py, px]:
+            up = True
+        if pad_arr[py, px + 1] == pad_arr[py, px]:
+            right = True
+        if pad_arr[py, px - 1] == pad_arr[py, px]:
+            left = True
 
-print("Result 1" + str(total_p))
+        dir_list = [up, down, left, right]
+        print(dir_list)
 
-print(unique)
+        if not up and not down and not left and not right:
+            sides += 4
+        
+        elif up and down and not left and not right or left and right and not up and not down:
+            continue
+        
+        elif dir_list.count(True) == 2:
+            sides += 1
+        
+        elif dir_list.count(True) == 1:
+            sides += 2
+
+    print(island)
+    print(sides)
+
+
+# print("Result 2" + str(sides))
+
+# print(unique)
 
 ####
+
+# Corners:
+#   #
+   #A# - 2
+
+    #
+# 1 A 1 - 0
+# 1 A 1 
+
+# If there are 2 sides, that are next to each other, it's 1
+# If it's an end-piece there is 2
+# If there is a piece on either side, it's 0
+# If it's everywhere, it's 4
